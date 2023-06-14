@@ -11,6 +11,10 @@ load_dotenv()
 server_url = os.getenv('SERVERURL')
 server = xmlrpc.client.Server(server_url)
 
+# contracts user home to ~ 
+def contractuser(path):
+    return path.replace(os.path.expanduser('~'), '~', 1)
+
 # RUTORRENT PATHS
 rtorrent = []
 torrenthash = server.download_list("", "main")
@@ -22,9 +26,6 @@ def ru_paths():
 			rtorrent.append(i)
 
 # HOST PATHS
-def contractuser(path):
-    return path.replace(os.path.expanduser('~'), '~', 1)
-
 host = []
 def host_paths():
 	root = '~/data/downloads/complete/'
@@ -38,7 +39,9 @@ def host_paths():
 				#print("HOST: " + inner_path)
 				host.append(inner_path)
 
+
 # SCRIPT STARTS
+# no it doesn't really need threading but I wanted to do it so screw you
 thr1 = threading.Thread(target=ru_paths)
 thr2 = threading.Thread(target=host_paths)
 
@@ -50,12 +53,14 @@ thr2.join()
 
 print()
 
+# Compare lists and find unique to host
 set1 = set(rtorrent)
 set2 = set(host)
 
 unique_to_rtorrent = set1 - set2
 unique_to_host = set2 - set1
 
+# Prompt user to delete files to ensure nothing goes wrong
 for i in unique_to_host:
 	print()
 	print(i)
